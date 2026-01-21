@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ $title ?? 'My App' }}</title>
+    <script src="https://cdn.shopify.com/shopifycloud/polaris.js" ></script>
     @vite('resources/js/app.js')
 </head>
 <body class="bg-gray-50">

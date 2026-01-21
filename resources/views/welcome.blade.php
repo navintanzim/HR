@@ -40,13 +40,14 @@
 
                     @if (Route::has('register'))
                         <s-button
-                        url="{{ route('register') }}"
                         size="slim"
                         outline
-                        >
+                        onclick="window.location.href='{{ route('register') }}'"
+                    >
                         Register
-                        </s-button>
+                    </s-button>
                     @endif
+                    
                     @endauth
                 </s-inline-stack>
                 </s-section></div>
