@@ -1,7 +1,7 @@
 <x-layout>
     <s-page>
         <s-section>
-            
+
             <h2> Leave Application</h2>
 
             <form method="POST" action="{{ route('leave.store') }}">
@@ -14,8 +14,8 @@
                         label="Leave type"
                         name="leave_type"
                         id="leave_type">
+                        <s-choice value="half_day">Half day</s-choice>
                         <s-choice value="full_day">Full day</s-choice>
-                        <s-choice value="multiple_day">Multiple day</s-choice>
                     </s-choice-list>
 
 
@@ -29,6 +29,15 @@
                         name="end_date"
                         id="end_date"
                         style="display: none;"></s-date-field>
+
+                    <s-choice-list
+                        label="Time"
+                        name="time"
+                        id="time"
+                        style="display: none;">
+                        <s-choice value="before_lunch">Before Lunch</s-choice>
+                        <s-choice value="after_lunch">After Lunch</s-choice>
+                    </s-choice-list>
 
                     <s-text-area
                         label="Reason"
@@ -52,11 +61,13 @@
         leaveType.addEventListener('change', (event) => {
             var type = event.currentTarget.values[0];
 
-            if (type === 'multiple_day') {
+            if (type === 'full_day') {
 
                 endDate.style.display = 'block';
+                time.style.display = 'none';
             } else {
                 endDate.style.display = 'none';
+                time.style.display = 'block';
             }
         });
     </script>

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('paid_used');
             $table->integer('unpaid_total');
             $table->integer('unpaid_used');
+            $table->integer('half_day')->nullable();
             $table->timestamps();
         });
     }

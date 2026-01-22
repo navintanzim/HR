@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->integer('total_days');
+            $table->string('time')->nullable();
             $table->longText('reason');
             $table->string('status');
             $table->longText('admin_note')->nullable();

@@ -5,7 +5,7 @@
 
             <p><strong>Employee:</strong> {{ $leave->user_name }}</p>
             <p><strong>Contact:</strong> {{ $leave->user_email }}</p>
-            <p><strong>Leave Type:</strong>  @if($leave->leave_type=='multiple_day') Multiple day @else Full day @endif</p>
+            <p><strong>Leave Type:</strong>  @if($leave->leave_type=='full_day') Full day @else Half day @endif</p>
             <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('Y-m-d') }}</p>
             <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('Y-m-d') }}</p>
 

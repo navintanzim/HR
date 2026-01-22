@@ -18,6 +18,7 @@ class DashboardController extends Controller
         $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
             'paid_total',
             'paid_used',
+            'half_day',
             'unpaid_total',
             'unpaid_used'
         ]);

@@ -28,11 +28,13 @@ class LeaveController extends Controller
         ]);
 
         $start = Carbon::parse($request->input('start_date'));
-        if ($data['leave_type'] == 'full_day') {
+        if ($data['leave_type'] == 'half_day') {
             $end = $start;
+            $time = $request->input('time');
             $totalDays = 1;
         } else {
             $end = Carbon::parse($request->input('end_date'));
+            $time = null ;
             $totalDays = $start->diffInDays($end) + 1;
         }
 
@@ -42,6 +44,7 @@ class LeaveController extends Controller
             'start_date'  => $data['start_date'],
             'end_date'    => $data['end_date'] ?? $data['start_date'],
             'total_days'      => $totalDays ?? null,
+            'time'      => $time,
             'reason'      => $data['reason'],
             'status'      => 'Pending',
             'submitted_at' => now(),
@@ -77,14 +80,19 @@ class LeaveController extends Controller
         $data['decided_by'] = Auth::user()->employee_id;
         $leave->update($data);
 
-        if($request->status == 'approved'){
+        if($request->status == 'Approved'){
             $leave_balance = LeaveBalance::where('employee_id', $leave->employee_id)->first();
-            if ($leave_balance->paid_total > 0) {
-                $leave_balance->paid_used = $leave->total_days;
+
+            if ($leave->leave_type == 'full_day') {
+                if ($leave_balance->paid_total > $leave_balance->paid_used) {
+                    $leave_balance->paid_used = $leave_balance->paid_used + $leave->total_days;
+                } else {
+                    $leave_balance->unpaid_used =  $leave_balance->unpaid_used + $leave->total_days;
+                }
             } else {
-                $leave_balance->unpaid_used = $leave->total_days;
+                $leave_balance->half_day = $leave_balance->half_day + 1;
             }
-            $leave_balance->paid_used = $leave_balance->paid_used - $leave->total_days;
+
             $leave_balance->save();
         }
         
