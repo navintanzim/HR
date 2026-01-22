@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
         ->name('leave.process.form');
     Route::post('/leave/{id}/process', [LeaveController::class, 'process'])
         ->name('leave.process');
+    Route::post('/checkin', [DashboardController::class, 'Checkin'])
+        ->name('checkin');
 });
 
 
