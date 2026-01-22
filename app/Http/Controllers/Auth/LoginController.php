@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\LeaveBalance;
 
 class LoginController extends Controller
 {
@@ -41,27 +43,47 @@ class LoginController extends Controller
     {
         
         $data = $request->validate([
-            'employee_id' => 'required|string|max:255|unique:users',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed', 
             'role' => 'required|string|max:50',
         ]);
-
-        // create the user
-        $user = User::create([
-            'employee_id' => $data['employee_id'],
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'email_verified_at' => now(),
-            'password' => Hash::make($data['password']),
-            'role' => $data['role'],
-            'created_at' => now(),
-        ]);
-
         
-        Auth::login($user);
 
-        return redirect('/login')->with('status', 'User registered successfully!');
+        if($data['role']=="admin"){
+            $role= '101';
+        }else{
+            $role= '505';
+        }
+        $lastIndex = User::latest('id')->value('id') ?? 0;
+        DB::transaction(function () use ($role, $lastIndex,$data) {
+            $user = User::create([
+                'employee_id' => $role . $lastIndex + 1,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'email_verified_at' => now(),
+                'password' => Hash::make($data['password']),
+                'role' => $role,
+                'created_at' => now(),
+            ]);
+
+            if ($role === '505') {
+                $leave = LeaveBalance::create([
+                    'employee_id' => $role . $lastIndex + 1,
+                    'year' => now()->year,
+                    'paid_total' => 14,
+                    'paid_used' => 0,
+                    'unpaid_total' => 5,
+                    'unpaid_used' => 0,
+                    'created_at' => now(),
+                ]);
+            }
+
+             Auth::login($user);
+        });
+        
+       
+
+        return redirect('/dashboard')->with('status', 'User registered successfully!');
     }
 }
