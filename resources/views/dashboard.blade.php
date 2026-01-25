@@ -1,28 +1,36 @@
 @php
 use Carbon\Carbon;
-$now = Carbon::now('Asia/Dhaka');
+use App\Models\Settings;
+
+$timezone = Settings::where('key', 'Timezone')->first()->value;
+$now = Carbon::now($timezone);
 $currentTime = $now->format('H:i');
+$attendanceWindows = Settings::where('key', 'attendance_windows')->first()->value;
+$checkInLabel = null;
 
+foreach ($attendanceWindows as $label => $window) {
+    if (isset($window['before']) && $currentTime < $window['before']) {
+        $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+        break;
+    }
 
-if ($currentTime < '09:00' ) {
-  $checkInLabel='Check in, Early' ;
-  } elseif ($currentTime>= '09:00' && $currentTime <= '09:05' ) {
-    $checkInLabel='Check in, On time' ;
-    } elseif ($currentTime>= '09:06' && $currentTime <= '09:15' ) {
-      $checkInLabel='Check in, Late' ;
-      } elseif ($currentTime>= '09:16' && $currentTime <= '09:30' ) {
-        $checkInLabel='Check in, Very late' ;
-        } else {
-        $checkInLabel=null;
-        }
+    if (isset($window['from'], $window['to']) && $currentTime >= $window['from'] && $currentTime <= $window['to']) {
+        $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+        break;
+    }
 
-        if ($leave){
-        $halfDayDeduction=intdiv($leave->half_day, 2);
-        $paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
-        }
+    if (isset($window['after']) && $currentTime > $window['after']) {
+        $checkInLabel = null; 
+    }
+}
 
+if ($leave){
+$halfDayDeduction=intdiv($leave->half_day, 2);
+$paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
+}
 
-        @endphp
+@endphp
+
         <x-layout>
           <s-page>
             <s-section>

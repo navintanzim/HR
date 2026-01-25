@@ -6,11 +6,13 @@ use Carbon\Carbon;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\Attendance;
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    
     public function index()
     {
 
@@ -51,14 +53,14 @@ class DashboardController extends Controller
 
      public function Checkin(Request $request)
     {
-
+        $timezone = Settings::where('key', 'Timezone')->first()->value;
         $attendance = Attendance::where('employee_id',Auth::user()->employee_id)
                     ->where('date',now()->startOfDay())->first();
         if($attendance){
             return redirect()->route('dashboard')->with('error', ' Checked In already today.');
         }
 
-        $now = Carbon::now('Asia/Dhaka');
+        $now = Carbon::now($timezone);
         $currentTime = $now->format('H:i');
 
         if ($currentTime < '09:00') {

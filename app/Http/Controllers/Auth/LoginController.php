@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\Settings;
 use App\Models\LeaveBalance;
 
 class LoginController extends Controller
@@ -58,7 +59,7 @@ class LoginController extends Controller
         $lastIndex = User::latest('id')->value('id') ?? 0;
         DB::transaction(function () use ($role, $lastIndex,$data) {
             $user = User::create([
-                'employee_id' => $role . $lastIndex + 1,
+                'employee_id' => $role . ($lastIndex + 1),
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'email_verified_at' => now(),
@@ -68,12 +69,13 @@ class LoginController extends Controller
             ]);
 
             if ($role === '505') {
-                $leave = LeaveBalance::create([
-                    'employee_id' => $role . $lastIndex + 1,
+                $leave = Settings::where('key', 'leave_policy')->first()->value;
+                 LeaveBalance::create([
+                    'employee_id' => $role . ($lastIndex + 1),
                     'year' => now()->year,
-                    'paid_total' => 14,
+                    'paid_total' => $leave['paid_leave'],
                     'paid_used' => 0,
-                    'unpaid_total' => 5,
+                    'unpaid_total' => $leave['unpaid_leave'],
                     'unpaid_used' => 0,
                     'created_at' => now(),
                 ]);

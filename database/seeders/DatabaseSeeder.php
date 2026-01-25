@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Settings;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,11 +16,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        Settings::create([
+            'key' => 'Timezone',
+            'value' => 'Asia/Dhaka',
+        ]);
+        Settings::create([
+            'key' => 'office_hours',
+            'value' => ['start_time' => '09:00'],
+        ]);
+        Settings::create([
+            'key' => 'leave_policy',
+            'value' => ['paid_leave' => '14','unpaid_leave'=> '5'],
+        ]);
+        Settings::create([
+            'key' => 'attendance_windows',
+            'value' => ['early' => ['before' => '09:00'],
+                        'on_time'=> ['from' => '09:00', 'to' => '09:05'],
+                        'late' => ['from' => '09:06', 'to' => '09:15'],
+                        'very_late' => ['from' => '09:16', 'to' => '09:30'],
+                        'absent' => ['after' => '09:30']],
         ]);
     }
 }
