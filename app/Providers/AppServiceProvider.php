@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->addNamespace('settings', base_path('app/Modules/Settings/Views'));
+        view()->addNamespace('employees', base_path('app/Modules/Employees/Views'));
     }
 }

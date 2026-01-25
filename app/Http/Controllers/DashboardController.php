@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\LeaveBalance;
+
 use App\Models\LeaveRequest;
 use App\Models\Attendance;
-use App\Models\Settings;
+use App\Modules\Settings\Models\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,15 +16,30 @@ class DashboardController extends Controller
     public function index()
     {
 
+        $timezone = Settings::where('key', 'Timezone')->first()->value;
+        $now = Carbon::now($timezone);
+        
+        $currentTime = $now->format('H:i');
+        $attendanceWindows = Settings::where('key', 'attendance_windows')->first()->value;
+        $checkInLabel = null;
 
-        $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
-            'paid_total',
-            'paid_used',
-            'half_day',
-            'unpaid_total',
-            'unpaid_used'
-        ]);
+        foreach ($attendanceWindows as $label => $window) {
+            if (isset($window['before']) && $currentTime < $window['before']) {
+                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+                break;
+            }
 
+            if (isset($window['from'], $window['to']) && $currentTime >= $window['from'] && $currentTime <= $window['to']) {
+                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+                break;
+            }
+
+            if (isset($window['after']) && $currentTime > $window['after']) {
+                $checkInLabel = null;
+            }
+        }
+        $paidRemaining = null;
+        $leave = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
                 ->where('status', 'Pending')->get([
@@ -38,6 +53,7 @@ class DashboardController extends Controller
                 'status'
             ]);
         } else {
+            
             $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->get([
                 'leave_type',
                 'start_date',
@@ -48,7 +64,7 @@ class DashboardController extends Controller
         }
 
 
-        return view('dashboard', compact('leave', 'leave_request'));
+        return view('dashboard', compact( 'leave_request','checkInLabel'));
     }
 
      public function Checkin(Request $request)

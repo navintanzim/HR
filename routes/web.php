@@ -10,6 +10,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+require base_path('app/Modules/Settings/routes.php');
+require base_path('app/Modules/Employees/routes.php');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
@@ -31,7 +33,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkin', [DashboardController::class, 'Checkin'])
         ->name('checkin');
 });
-
 
 
 Route::post('/logout', function (Illuminate\Http\Request $request) {
