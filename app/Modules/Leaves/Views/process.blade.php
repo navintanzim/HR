@@ -9,7 +9,7 @@
             <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('Y-m-d') }}</p>
             <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('Y-m-d') }}</p>
 
-            <form method="POST" action="{{ route('leave.process', $leave->id) }}">
+            <form method="POST" action="{{ route('leaves.process', $leave->id) }}">
                 @csrf
                 <s-select name="status" label="Action">
                     <s-option value="Approved">Approve</s-option>

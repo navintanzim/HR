@@ -17,8 +17,8 @@
             <s-stack>
       
     <a href="/dashboard" class="block p-2 hover:bg-gray-100 rounded">Dashboard</a>
-    <a href="/employees" class="block p-2 hover:bg-gray-100 rounded">Employees (Coming soon)</a>
-    <a href="/attendance" class="block p-2 hover:bg-gray-100 rounded">Attendance (Coming soon)</a>
+    <a href="/leaves" class="block p-2 hover:bg-gray-100 rounded">Leaves</a>
+    <a href="/attendance" class="block p-2 hover:bg-gray-100 rounded">Attendance</a>
     @if(Auth::user()->role=='101')
     <a href="/settings" class="block p-2 hover:bg-gray-100 rounded">Settings</a>
     @endif

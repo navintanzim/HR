@@ -15,31 +15,7 @@ class DashboardController extends Controller
     
     public function index()
     {
-
-        $timezone = Settings::where('key', 'Timezone')->first()->value;
-        $now = Carbon::now($timezone);
         
-        $currentTime = $now->format('H:i');
-        $attendanceWindows = Settings::where('key', 'attendance_windows')->first()->value;
-        $checkInLabel = null;
-
-        foreach ($attendanceWindows as $label => $window) {
-            if (isset($window['before']) && $currentTime < $window['before']) {
-                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
-                break;
-            }
-
-            if (isset($window['from'], $window['to']) && $currentTime >= $window['from'] && $currentTime <= $window['to']) {
-                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
-                break;
-            }
-
-            if (isset($window['after']) && $currentTime > $window['after']) {
-                $checkInLabel = null;
-            }
-        }
-        $paidRemaining = null;
-        $leave = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
                 ->where('status', 'Pending')->get([
@@ -54,7 +30,7 @@ class DashboardController extends Controller
             ]);
         } else {
             
-            $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->get([
+            $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->where('status', 'Pending')->get([
                 'leave_type',
                 'start_date',
                 'end_date',
@@ -64,7 +40,7 @@ class DashboardController extends Controller
         }
 
 
-        return view('dashboard', compact( 'leave_request','checkInLabel'));
+        return view('dashboard', compact( 'leave_request'));
     }
 
      public function Checkin(Request $request)

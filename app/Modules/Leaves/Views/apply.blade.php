@@ -4,7 +4,7 @@
 
             <h2> Leave Application</h2>
 
-            <form method="POST" action="{{ route('leave.store') }}">
+            <form method="POST" action="{{ route('leaves.store') }}">
                 @csrf
 
                 <s-stack spacing="tight">

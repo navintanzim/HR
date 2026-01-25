@@ -4,28 +4,62 @@ $absentCount = $attendance->where('status', 'Absent')->count();
 @endphp
 
 <x-layout>
-    <s-page>
-        <s-section>
-            <h1 class="text-xl font-bold mb-4">Employee Info</h1>
+  <s-page>
+    <s-section>
+      <h1 class="text-xl font-bold mb-4">Employee Info</h1>
 
-            
-
-      @if ($leave)
-      <s-stack>
-        <s-text type="strong">Total attendance: {{ $presentCount }}</s-text>
-        <s-text type="strong">Total absent days: {{ $absentCount }}</s-text>
+      @if(Auth::user()->role =='505')
 
 
-        <s-text type="strong">Paid total: {{ $leave->paid_total }}</s-text>
-        <s-text type="strong">Paid used: {{ $leave->paid_used }}</s-text>
-        <s-text type="strong">Half days: {{ $leave->half_day }}</s-text>
-        <s-text type="strong">Paid Remaining: {{ $paidRemaining}}</s-text>
-        <s-text type="strong">Unpaid total: {{ $leave->unpaid_total }}</s-text>
-        <s-text type="strong">Unpaid used: {{ $leave->unpaid_used }}</s-text>
-        <s-text type="strong">Unpaid Remaining: {{ $leave->unpaid_total - $leave->unpaid_used}}</s-text>
-      </s-stack>
+      @if($checkInLabel)
+      <form id="checkin-form" method="POST" action="{{ route('checkin') }}" style="display: inline;">
+        @csrf
+        <s-button
+          size="slim"
+          variant="primary"
+          type="submit">
+          {{ $checkInLabel }}
+        </s-button>
+      </form>
+      @elseif($checkInLabel==null)
+      <s-text type="strong">Too late for attendance checkin</s-text>
       @endif
 
-        </s-section>
-    </s-page>
+      @else
+
+      <s-table>
+        <s-table-header-row>
+          
+            <s-table-header>Employee ID</s-table-header>
+            <s-table-header>Date</s-table-header>
+            <s-table-header>Check-in Time</s-table-header>
+            <s-table-header>Status</s-table-header>
+            <s-table-header>Source</s-table-header>
+          
+        </s-table-header-row>
+
+        <s-table-body>
+          @forelse ($employee_attendance as $attendance)
+          <s-table-row>
+            <s-table-cell>{{ $attendance->employee_id }}</s-table-cell>
+            <s-table-cell>{{ $attendance->date }}</s-table-cell>
+            <s-table-cell>{{ $attendance->check_in_time }}</s-table-cell>
+            <s-table-cell>{{ $attendance->status }}</s-table-cell>
+            <s-table-cell>{{ $attendance->source_ip }}</s-table-cell>
+          </s-table-row>
+          @empty
+          <s-table-row>
+            <s-table-cell colspan="5">
+              <s-text>No attendance records found.</s-text>
+            </s-table-cell>
+          </s-table-row>
+          @endforelse
+        </s-table-body>
+      </s-table>
+
+      @endif
+      
+
+    </s-section>
+  </s-page>
 </x-layout>

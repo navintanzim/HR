@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 require base_path('app/Modules/Settings/routes.php');
 require base_path('app/Modules/Employees/routes.php');
+require base_path('app/Modules/Leaves/routes.php');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
@@ -21,15 +22,7 @@ Route::post('/register', [LoginController::class, 'register']);
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-    Route::get('/leave/apply', [LeaveController::class, 'create'])
-        ->name('leave.apply');
-
-    Route::post('/leave/apply', [LeaveController::class, 'store'])
-        ->name('leave.store');
-    Route::get('/leave/{id}/process', [LeaveController::class, 'showProcessForm'])
-        ->name('leave.process.form');
-    Route::post('/leave/{id}/process', [LeaveController::class, 'process'])
-        ->name('leave.process');
+    
     Route::post('/checkin', [DashboardController::class, 'Checkin'])
         ->name('checkin');
 });

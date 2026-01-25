@@ -2,30 +2,46 @@
 
 namespace App\Modules\Employees\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\LeaveBalance;
 use Illuminate\Support\Facades\Auth;
+use App\Modules\Settings\Models\Settings;
 
 class EmployeesController extends Controller
 {
     public function index()
     {
-        $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
-            'paid_total',
-            'paid_used',
-            'half_day',
-            'unpaid_total',
-            'unpaid_used'
-        ]);
+
+        $timezone = Settings::where('key', 'Timezone')->first()->value;
+        $now = Carbon::now($timezone);
+
+        $currentTime = $now->format('H:i');
+        $attendanceWindows = Settings::where('key', 'attendance_windows')->first()->value;
+        $checkInLabel = null;
+
+        foreach ($attendanceWindows as $label => $window) {
+            if (isset($window['before']) && $currentTime < $window['before']) {
+                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+                break;
+            }
+
+            if (isset($window['from'], $window['to']) && $currentTime >= $window['from'] && $currentTime <= $window['to']) {
+                $checkInLabel = "Check in, " . ucfirst(str_replace('_', ' ', $label));
+                break;
+            }
+
+            if (isset($window['after']) && $currentTime > $window['after']) {
+                $checkInLabel = null;
+            }
+        }
+        
 
         $attendance = Attendance::where('employee_id', Auth::user()->employee_id)->get();
-
-        if ($leave) {
-            $halfDayDeduction = intdiv($leave->half_day, 2);
-            $paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
-        }
-        return view('employees::index', compact('leave', 'paidRemaining', 'attendance'));
+        $employee_attendance = Attendance::get();
+        
+        return view('employees::index', compact('attendance','checkInLabel','employee_attendance'));
     }
 }

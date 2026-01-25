@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Modules\Settings\Models\Settings;
 use App\Models\LeaveBalance;
 use App\Models\Attendance;
-use App\Modules\Settings\Models\Settings;
 use Carbon\Carbon;
 
 class LoginController extends Controller

@@ -1,20 +1,64 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Leaves\Controllers;
+
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\LeaveApplication;
-use App\Models\LeaveBalance;
+use App\Http\Controllers\Controller;
 use App\Models\LeaveRequest;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use App\Models\LeaveBalance;
+use Illuminate\Support\Facades\Auth;
 
-class LeaveController extends Controller
+
+class LeavesController extends Controller
 {
+    public function index()
+    {
+
+        if (Auth::user()->role == '101') {
+            $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
+                ->where('status', 'Pending')->get([
+                'leave_requests.id',
+                'employee.employee_id',
+                'employee.name as name',
+                'leave_type',
+                'start_date',
+                'end_date',
+                'total_days',
+                'status'
+            ]);
+        } else {
+            
+            $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->get([
+                'leave_type',
+                'start_date',
+                'end_date',
+                'total_days',
+                'status'
+            ]);
+        }
+        $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
+            'paid_total',
+            'paid_used',
+            'half_day',
+            'unpaid_total',
+            'unpaid_used'
+        ]);
+
+        $paidRemaining = null ;
+        if ($leave) {
+            $halfDayDeduction = intdiv($leave->half_day, 2);
+            $paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
+        }
+        return view('leaves::index', compact('leave', 'paidRemaining','leave_request'));
+    }
+
     public function create()
     {
 
-        return view('apply');
+        return view('leaves::apply');
     }
 
     public function store(Request $request)
@@ -34,8 +78,18 @@ class LeaveController extends Controller
             $totalDays = 1;
         } else {
             $end = Carbon::parse($request->input('end_date'));
-            $time = null ;
-            $totalDays = $start->diffInDays($end) + 1;
+            $time = null;
+            $totalDays = 0;
+            $weekendDays = [5, 6];
+            $period = CarbonPeriod::create($start, $end);
+
+            foreach ($period as $date) {
+                if (in_array($date->dayOfWeekIso, $weekendDays)) {
+                    continue;
+                }
+
+                $totalDays++;
+            }
         }
 
         LeaveRequest::create([
@@ -55,7 +109,7 @@ class LeaveController extends Controller
             ->with('success', 'Leave application submitted.');
     }
 
-    public function showProcessForm($id)
+     public function showProcessForm($id)
     {
 
         $leave = LeaveRequest::leftJoin('users', 'leave_requests.employee_id', '=', 'users.employee_id')
@@ -66,7 +120,7 @@ class LeaveController extends Controller
             )
             ->where('leave_requests.id', $id)
             ->first();
-        return view('process', compact('leave'));
+        return view('leaves::process', compact('leave'));
     }
 
     public function process(Request $request, $id)
