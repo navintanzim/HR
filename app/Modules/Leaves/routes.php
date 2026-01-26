@@ -16,4 +16,7 @@ Route::prefix('leaves')->group(function () {
         ->name('leaves.employee');
     Route::post('/{id}/process', [LeavesController::class, 'process'])
         ->name('leaves.process');
+
+    Route::get('/{id}/leave-count', [LeavesController::class, 'leaveCount']);
+
 });

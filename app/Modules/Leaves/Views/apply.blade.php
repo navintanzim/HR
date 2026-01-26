@@ -40,8 +40,8 @@
                     </s-choice-list>
 
                     <s-text-area
-                        label="Reason"
-                        name="reason">
+                        label="Reason (max 500 characters)"
+                        name="reason" required>
                     </s-text-area>
 
 

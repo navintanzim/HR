@@ -215,17 +215,29 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     const lifetimeBtn = document.getElementById('toggleLifetimeBtn');
     const weeklyBtn = document.getElementById('toggleWeeklyBtn');
+    const monthlyBtn = document.getElementById('toggleMonthlyBtn');
 
     const lifetimeContainer = document.getElementById('lifetimeChartContainer');
     const weeklyContainer = document.getElementById('weeklyChartContainer');
+    const monthlyContainer = document.getElementById('monthlyChartContainer');
 
     lifetimeBtn.addEventListener('click', () => {
         lifetimeContainer.style.display = lifetimeContainer.style.display === 'none' ? '' : 'none';
+        weeklyContainer.style.display = 'none';
+        monthlyContainer.style.display = 'none';
     });
 
     weeklyBtn.addEventListener('click', () => {
         
         weeklyContainer.style.display = weeklyContainer.style.display === 'none' ? '' : 'none';
+        lifetimeContainer.style.display = 'none';
+        monthlyContainer.style.display = 'none';
+    });
+    monthlyBtn.addEventListener('click', () => {
+        
+        monthlyContainer.style.display = monthlyContainer.style.display === 'none' ? '' : 'none';
+        weeklyContainer.style.display = 'none';
+        lifetimeContainer.style.display = 'none';
     });
 });
 

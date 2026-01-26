@@ -8,6 +8,7 @@
             <p><strong>Leave Type:</strong>  @if($leave->leave_type=='full_day') Full day @else Half day @endif</p>
             <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('Y-m-d') }}</p>
             <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('Y-m-d') }}</p>
+            <p><strong>Reason:</strong> {{ $leave->reason }}</p>
 
             <form method="POST" action="{{ route('leaves.process', $leave->id) }}">
                 @csrf

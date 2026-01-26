@@ -46,9 +46,9 @@ $absent_attendance_weekly = $attendance_weekly->where('status', 'Absent')->count
 <x-layout>
   <s-page>
     <s-section>
-      <h1 class="text-xl font-bold mb-4">Employee Attendance Info</h1>
+      <h1 class="text-xl font-bold mb-4">Employee Attendance Info for this employee</h1>
 
-      @if(Auth::user()->role =='505')
+      @if(Auth::user()->role =='101')
 
       <s-section>
     <s-text type="strong">Attendance Summary (Toggle buttons to view more charts)</s-text>
@@ -76,56 +76,7 @@ $absent_attendance_weekly = $attendance_weekly->where('status', 'Absent')->count
    
 </s-section>
 
-
-
-      @if($checkInLabel)
-      <form id="checkin-form" method="POST" action="{{ route('checkin') }}" style="display: inline;">
-        @csrf
-        <s-button
-          size="slim"
-          variant="primary"
-          type="submit">
-          {{ $checkInLabel }}
-        </s-button>
-      </form>
-      @elseif($checkInLabel==null)
-      <s-text tone="critical" type="strong">Too late for attendance checkin</s-text>
-      @endif
-
-      @else
-
-      <s-badge>Todays attendances</s-badge>
-      <s-table>
-        <s-table-header-row>
-
-          <s-table-header>Employee ID</s-table-header>
-          <s-table-header>Employee Name</s-table-header>
-          <s-table-header>Date</s-table-header>
-          <s-table-header>Check-in Time</s-table-header>
-          <s-table-header>Status</s-table-header>
-          <s-table-header>Source</s-table-header>
-
-        </s-table-header-row>
-
-        <s-table-body>
-          @forelse ($employee_attendance as $attendance)
-          <s-table-row>
-            <s-table-cell>{{ $attendance->employee_id }}</s-table-cell>
-            <s-table-cell>{{ $attendance->name }}</s-table-cell>
-            <s-table-cell>{{ $attendance->date }}</s-table-cell>
-            <s-table-cell>{{ $attendance->check_in_time }}</s-table-cell>
-            <s-table-cell>{{ $attendance->status }}</s-table-cell>
-            <s-table-cell>{{ $attendance->source_ip }}</s-table-cell>
-          </s-table-row>
-          @empty
-          <s-table-row>
-            <s-table-cell colspan="5">
-              <s-text>No attendance records found.</s-text>
-            </s-table-cell>
-          </s-table-row>
-          @endforelse
-        </s-table-body>
-      </s-table>
+      
 
       @endif
 

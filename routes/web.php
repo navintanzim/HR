@@ -25,6 +25,9 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/checkin', [DashboardController::class, 'Checkin'])
         ->name('checkin');
+
+    Route::get('/admin/attendance/{employee}', [DashboardController::class, 'employeeAttendanceData'])
+    ->name('admin.attendance');
 });
 
 

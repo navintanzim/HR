@@ -48,7 +48,10 @@ class EmployeesController extends Controller
         ->get();
 
         $attendance = Attendance::where('employee_id', Auth::user()->employee_id)->get();
-        $employee_attendance = Attendance::get();
+        $employee_attendance = Attendance::leftjoin('users as employee', 'employee.employee_id', 'attendance.employee_id')
+        ->whereDate('attendance.date', Carbon::today())
+        ->get(['attendance.*',
+                'employee.name']);
         
         return view('employees::index', compact('attendance','checkInLabel','employee_attendance','attendance_monthly','attendance_weekly'));
     }

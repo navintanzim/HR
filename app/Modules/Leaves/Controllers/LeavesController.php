@@ -93,7 +93,7 @@ class LeavesController extends Controller
             'leave_type' => 'required|string|max:50',
             'start_date' => 'required|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
-            'reason'     => 'nullable|string|max:500',
+            'reason'     => 'required|nullable|string|max:500',
         ]);
 
         $start = Carbon::parse($request->input('start_date'));
@@ -192,8 +192,58 @@ class LeavesController extends Controller
                 'start_date',
                 'end_date',
                 'total_days',
+                'reason',
                 'status'
             ]);
-        return view('leaves::employee', compact('team_leaves'));
+        $pending_leaves = LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
+            ->where('leave_requests.employee_id', $id)
+            ->where('leave_requests.status', 'Pending')
+            ->get([
+                'leave_requests.id',
+                'employee.employee_id',
+                'employee.name as name',
+                'leave_type',
+                'start_date',
+                'end_date',
+                'total_days',
+                'reason',
+                'status'
+            ]);
+        return view('leaves::employee', compact('team_leaves','id','pending_leaves'));
     }
+
+    public function leaveCount(Request $request, $id)
+    {
+        $request->validate([
+            'from_date' => 'required|date',
+            'to_date'   => 'required|date|after_or_equal:from_date',
+        ]);
+
+        $from = Carbon::parse($request->from_date)->startOfDay();
+        $to   = Carbon::parse($request->to_date)->endOfDay();
+
+        $full_count = LeaveRequest::where('employee_id', $id)
+            ->where('status','Approved')
+            ->where('leave_type','full_day')
+            ->where(function ($q) use ($from, $to) {
+                $q->whereDate('start_date', '<=', $to)
+                ->whereDate('end_date', '>=', $from);
+            })
+            ->sum('total_days'); 
+        $half_count = LeaveRequest::where('employee_id', $id)
+            ->where('status','Approved')
+            ->where('leave_type','half_day')
+            ->where(function ($q) use ($from, $to) {
+                $q->whereDate('start_date', '<=', $to)
+                ->whereDate('end_date', '>=', $from);
+            })
+            ->sum('total_days'); 
+
+            $count = $full_count + floor($half_count/2);
+
+        return response()->json([
+            'count' => $count,
+        ]);
+    }
+
 }

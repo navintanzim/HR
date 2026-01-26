@@ -6,6 +6,7 @@ use Carbon\Carbon;
 
 use App\Models\LeaveRequest;
 use App\Models\Attendance;
+use App\Models\User;
 use App\Modules\Settings\Models\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class DashboardController extends Controller
     
     public function index()
     {
-        
+        $employees = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
                 ->where('status', 'Pending')->get([
@@ -28,6 +29,8 @@ class DashboardController extends Controller
                 'total_days',
                 'status'
             ]);
+
+            $employees = User::where('role','505')->get();
         } else {
             
             $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->where('status', 'Pending')->get([
@@ -40,7 +43,7 @@ class DashboardController extends Controller
         }
 
 
-        return view('dashboard', compact( 'leave_request'));
+        return view('dashboard', compact( 'leave_request','employees'));
     }
 
      public function Checkin(Request $request)
@@ -80,5 +83,20 @@ class DashboardController extends Controller
         
 
         return redirect()->route('dashboard')->with('success', ' Checked In successfully.');
+    }
+
+    public function employeeAttendanceData($employee)
+    {
+        
+        $attendance = Attendance::where('employee_id', $employee)->get();
+        $startOfMonth = Carbon::now()->subMonth()->startOfDay();
+        $startOfWeek = Carbon::now()->subWeek()->startOfDay();
+        $attendance_monthly = Attendance::where('employee_id',  $employee)
+        ->where('created_at', '>=', $startOfMonth)
+        ->get();
+        $attendance_weekly = Attendance::where('employee_id',  $employee)
+        ->where('created_at', '>=', $startOfWeek)
+        ->get();
+        return view('attendance_charts', compact('attendance','attendance_monthly','attendance_weekly'));
     }
 }

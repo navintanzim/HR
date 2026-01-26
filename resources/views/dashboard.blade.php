@@ -35,6 +35,53 @@
         @else
         <s-text type="strong" style="margin-bottom: 8px;">Pending Leave Requests: {{count($leave_request)}}</s-text>
 
+        <div style="margin: 10px;">
+
+        <s-table>
+        <s-table-header-row>
+
+          <s-table-header>Employee ID</s-table-header>
+          <s-table-header>Employee Name</s-table-header>
+          <s-table-header>Email</s-table-header>
+          <s-table-header>Action</s-table-header>
+
+        </s-table-header-row>
+
+        <s-table-body>
+          @forelse ($employees as $employee)
+          <s-table-row>
+            <s-table-cell>{{ $employee->employee_id }}</s-table-cell>
+            <s-table-cell>{{ $employee->name }}</s-table-cell>
+            <s-table-cell>{{ $employee->email }}</s-table-cell>
+            <s-table-cell>
+
+            <s-button
+              size="slim"
+              variant="primary"
+              onClick="window.location.href='{{ route('leaves.employee', $employee->employee_id) }}'">
+               View Leave
+            </s-button>
+            <s-button
+              size="slim"
+              variant="primary"
+              onclick="window.location.href='{{ route('admin.attendance',$employee->employee_id) }}'">
+              View Attendance
+            </s-button>
+
+            </s-table-cell>
+          </s-table-row>
+          @empty
+          <s-table-row>
+            <s-table-cell colspan="4">
+              <s-text>No records found.</s-text>
+            </s-table-cell>
+          </s-table-row>
+          @endforelse
+        </s-table-body>
+      </s-table>
+
+        </div>
+
         @endif
 
       </s-section>
