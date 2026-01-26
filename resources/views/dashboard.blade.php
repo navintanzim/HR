@@ -1,5 +1,5 @@
 <x-layout>
-  
+
 
   <s-page>
     <s-section>
@@ -20,14 +20,24 @@
       <p>This is your dashboard.</p>
 
 
-        <s-section>
-          @if(Auth::user()->role =='505')
-          <s-text type="strong" style="margin-bottom: 8px;">Your Pending Leave Requests: {{count($leave_request)}}</s-text>
-          @else
-          <s-text type="strong" style="margin-bottom: 8px;">Pending Leave Requests: {{count($leave_request)}}</s-text>
-          @endif
-         
-        </s-section>
+      <s-section>
+        @if(Auth::user()->role =='505')
+        <s-stack>
+          <s-text type="strong" tone="info" style="margin-bottom: 8px;">Your Pending Leave Requests: {{count($leave_request)}}</s-text> &nbsp;
+          <s-button
+            size="slim"
+            variant="primary"
+            onclick="window.location.href='{{ route('leaves.apply') }}'">
+            Apply for Leave
+          </s-button> &nbsp;
+        </s-stack>
+
+        @else
+        <s-text type="strong" style="margin-bottom: 8px;">Pending Leave Requests: {{count($leave_request)}}</s-text>
+
+        @endif
+
+      </s-section>
 
 
       <form method="POST" action="{{ route('logout') }}">

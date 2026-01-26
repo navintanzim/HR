@@ -38,10 +38,18 @@ class EmployeesController extends Controller
             }
         }
         
+        $startOfMonth = Carbon::now()->subMonth()->startOfDay();
+        $startOfWeek = Carbon::now()->subWeek()->startOfDay();
+        $attendance_monthly = Attendance::where('employee_id', Auth::user()->employee_id)
+        ->where('created_at', '>=', $startOfMonth)
+        ->get();
+        $attendance_weekly = Attendance::where('employee_id', Auth::user()->employee_id)
+        ->where('created_at', '>=', $startOfWeek)
+        ->get();
 
         $attendance = Attendance::where('employee_id', Auth::user()->employee_id)->get();
         $employee_attendance = Attendance::get();
         
-        return view('employees::index', compact('attendance','checkInLabel','employee_attendance'));
+        return view('employees::index', compact('attendance','checkInLabel','employee_attendance','attendance_monthly','attendance_weekly'));
     }
 }

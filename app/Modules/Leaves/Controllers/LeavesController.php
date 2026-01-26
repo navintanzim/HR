@@ -16,21 +16,44 @@ class LeavesController extends Controller
 {
     public function index()
     {
-
+        $team_leaves = null;
+        $paidRemaining = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
                 ->where('status', 'Pending')->get([
-                'leave_requests.id',
+                    'leave_requests.id',
+                    'employee.employee_id',
+                    'employee.name as name',
+                    'leave_type',
+                    'start_date',
+                    'end_date',
+                    'total_days',
+                    'status'
+                ]);
+
+            $leave = LeaveBalance::leftjoin('users as employee', 'employee.employee_id', 'leave_balances.employee_id')->get([
                 'employee.employee_id',
                 'employee.name as name',
-                'leave_type',
-                'start_date',
-                'end_date',
-                'total_days',
-                'status'
+                'paid_total',
+                'paid_used',
+                'half_day',
+                'unpaid_total',
+                'unpaid_used'
             ]);
+
+            $team_leaves = LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
+                ->get([
+                    'leave_requests.id',
+                    'employee.employee_id',
+                    'employee.name as name',
+                    'leave_type',
+                    'start_date',
+                    'end_date',
+                    'total_days',
+                    'status'
+                ]);
         } else {
-            
+
             $leave_request =  LeaveRequest::where('employee_id', Auth::user()->employee_id)->get([
                 'leave_type',
                 'start_date',
@@ -38,21 +61,23 @@ class LeavesController extends Controller
                 'total_days',
                 'status'
             ]);
+            $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
+                'paid_total',
+                'paid_used',
+                'half_day',
+                'unpaid_total',
+                'unpaid_used'
+            ]);
+            if ($leave) {
+                $halfDayDeduction = intdiv($leave->half_day, 2);
+                $paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
+            }
         }
-        $leave = LeaveBalance::where('employee_id', Auth::user()->employee_id)->first([
-            'paid_total',
-            'paid_used',
-            'half_day',
-            'unpaid_total',
-            'unpaid_used'
-        ]);
 
-        $paidRemaining = null ;
-        if ($leave) {
-            $halfDayDeduction = intdiv($leave->half_day, 2);
-            $paidRemaining = $leave->paid_total - $leave->paid_used - $halfDayDeduction;
-        }
-        return view('leaves::index', compact('leave', 'paidRemaining','leave_request'));
+
+
+
+        return view('leaves::index', compact('leave', 'paidRemaining', 'leave_request', 'team_leaves'));
     }
 
     public function create()
@@ -109,7 +134,7 @@ class LeavesController extends Controller
             ->with('success', 'Leave application submitted.');
     }
 
-     public function showProcessForm($id)
+    public function showProcessForm($id)
     {
 
         $leave = LeaveRequest::leftJoin('users', 'leave_requests.employee_id', '=', 'users.employee_id')
@@ -134,7 +159,7 @@ class LeavesController extends Controller
         $data['decided_by'] = Auth::user()->employee_id;
         $leave->update($data);
 
-        if($request->status == 'Approved'){
+        if ($request->status == 'Approved') {
             $leave_balance = LeaveBalance::where('employee_id', $leave->employee_id)->first();
 
             if ($leave->leave_type == 'full_day') {
@@ -149,8 +174,26 @@ class LeavesController extends Controller
 
             $leave_balance->save();
         }
-        
+
 
         return redirect()->route('dashboard')->with('success', 'Leave request processed successfully.');
+    }
+
+    public function employeeData($id)
+    {
+
+        $team_leaves = LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
+            ->where('leave_requests.employee_id', $id)
+            ->get([
+                'leave_requests.id',
+                'employee.employee_id',
+                'employee.name as name',
+                'leave_type',
+                'start_date',
+                'end_date',
+                'total_days',
+                'status'
+            ]);
+        return view('leaves::employee', compact('team_leaves'));
     }
 }
