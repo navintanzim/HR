@@ -28,7 +28,8 @@
                 <a href="/attendance" class="block rounded" style="padding: 50px;">Attendance</a>
 
                 @if(Auth::user()->role=='101')
-                <a href="/settings" class="block p-2 hover:bg-gray-100 rounded">Settings</a>
+                <a href="/settings" class="block p-2 hover:bg-gray-100 rounded" style="padding: 50px;">Settings</a>
+                <a href="/users" class="block p-2 hover:bg-gray-100 rounded">Users</a>
                 @endif
             </s-inline-stack>
         </nav>

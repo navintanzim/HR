@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\Settings\Models\Settings;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,6 +18,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
+        User::create([
+            'employee_id' => '1011',
+            'name' => 'HR',
+            'email' => 'support@klinkode.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('klincode'),
+            'role' => '101',
+        ]);
         Settings::create([
             'key' => 'Timezone',
             'value' => 'Asia/Dhaka',

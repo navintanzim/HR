@@ -37,16 +37,6 @@
                      <a href="{{ route('login') }}">
                         <s-button size="slim">Log in</s-button>
                     </a>
-
-                    @if (Route::has('register'))
-                        <s-button
-                        size="slim"
-                        outline
-                        onclick="window.location.href='{{ route('register') }}'"
-                    >
-                        Register
-                    </s-button>
-                    @endif
                     
                     @endauth
                 </s-inline-stack>

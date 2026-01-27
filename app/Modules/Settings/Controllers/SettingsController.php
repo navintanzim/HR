@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Modules\Settings\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\Settings\Models\Settings;
@@ -10,8 +10,13 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        $settings = Settings::all()->pluck('value', 'key')->toArray();
+        if(Auth::user()->role =='101'){
+            $settings = Settings::all()->pluck('value', 'key')->toArray();
         return view('settings::index', compact('settings'));
+        }else{
+            dd('You are not authorized for this section. Please contact the system admin.');
+        }
+        
     }
 
     public function update(Request $request)

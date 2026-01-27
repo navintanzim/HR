@@ -10,6 +10,11 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\LeaveBalance;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\LeaveDecisionMail;
+use App\Mail\LeaveRequestMail;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 
 class LeavesController extends Controller
@@ -93,12 +98,11 @@ class LeavesController extends Controller
             'leave_type' => 'required|string|max:50',
             'start_date' => 'required|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
-            'reason'     => 'required|nullable|string|max:500',
+            'reason'     => 'required|string|max:500',
         ]);
 
         $start = Carbon::parse($request->input('start_date'));
         if ($data['leave_type'] == 'half_day') {
-            $end = $start;
             $time = $request->input('time');
             $totalDays = 1;
         } else {
@@ -117,7 +121,7 @@ class LeavesController extends Controller
             }
         }
 
-        LeaveRequest::create([
+        $leave = LeaveRequest::create([
             'employee_id' => Auth::user()->employee_id,
             'leave_type'  => $data['leave_type'],
             'start_date'  => $data['start_date'],
@@ -128,6 +132,18 @@ class LeavesController extends Controller
             'status'      => 'Pending',
             'submitted_at' => now(),
         ]);
+
+        $employee_mail = Auth::user()->email;
+        $admins = User::where('role', '101')->get();
+
+        try {
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)
+                    ->send(new LeaveRequestMail($leave, $employee_mail));
+            }
+        } catch (\Exception $e) {
+            Log::error("Leave mail failed for leave {$leave->id}: " . $e->getMessage());
+        }
 
         return redirect()
             ->route('dashboard')
@@ -158,7 +174,7 @@ class LeavesController extends Controller
         $data['decided_at'] = now();
         $data['decided_by'] = Auth::user()->employee_id;
         $leave->update($data);
-
+        $user = User::where('employee_id', $leave->employee_id)->first();
         if ($request->status == 'Approved') {
             $leave_balance = LeaveBalance::where('employee_id', $leave->employee_id)->first();
 
@@ -175,6 +191,8 @@ class LeavesController extends Controller
             $leave_balance->save();
         }
 
+        Mail::to($user->email)
+            ->send(new LeaveDecisionMail($leave, $request->status));
 
         return redirect()->route('dashboard')->with('success', 'Leave request processed successfully.');
     }
@@ -209,7 +227,7 @@ class LeavesController extends Controller
                 'reason',
                 'status'
             ]);
-        return view('leaves::employee', compact('team_leaves','id','pending_leaves'));
+        return view('leaves::employee', compact('team_leaves', 'id', 'pending_leaves'));
     }
 
     public function leaveCount(Request $request, $id)
@@ -223,27 +241,26 @@ class LeavesController extends Controller
         $to   = Carbon::parse($request->to_date)->endOfDay();
 
         $full_count = LeaveRequest::where('employee_id', $id)
-            ->where('status','Approved')
-            ->where('leave_type','full_day')
+            ->where('status', 'Approved')
+            ->where('leave_type', 'full_day')
             ->where(function ($q) use ($from, $to) {
                 $q->whereDate('start_date', '<=', $to)
-                ->whereDate('end_date', '>=', $from);
+                    ->whereDate('end_date', '>=', $from);
             })
-            ->sum('total_days'); 
+            ->sum('total_days');
         $half_count = LeaveRequest::where('employee_id', $id)
-            ->where('status','Approved')
-            ->where('leave_type','half_day')
+            ->where('status', 'Approved')
+            ->where('leave_type', 'half_day')
             ->where(function ($q) use ($from, $to) {
                 $q->whereDate('start_date', '<=', $to)
-                ->whereDate('end_date', '>=', $from);
+                    ->whereDate('end_date', '>=', $from);
             })
-            ->sum('total_days'); 
+            ->sum('total_days');
 
-            $count = $full_count + floor($half_count/2);
+        $count = $full_count + floor($half_count / 2);
 
         return response()->json([
             'count' => $count,
         ]);
     }
-
 }

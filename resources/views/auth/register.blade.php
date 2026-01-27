@@ -1,4 +1,4 @@
-<x-layout-login>
+<x-layout>
     <s-page>
         <s-section>
             <form method="POST" action="{{ route('register') }}">
@@ -45,4 +45,4 @@
             </form>
         </s-section>
     </s-page>
-</x-layout-login>
+</x-layout>

@@ -13,11 +13,12 @@ Route::get('/', function () {
 require base_path('app/Modules/Settings/routes.php');
 require base_path('app/Modules/Employees/routes.php');
 require base_path('app/Modules/Leaves/routes.php');
+require base_path('app/Modules/Users/routes.php');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
+
 Route::post('/login', [LoginController::class, 'login']);
-Route::post('/register', [LoginController::class, 'register']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -28,6 +29,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/attendance/{employee}', [DashboardController::class, 'employeeAttendanceData'])
     ->name('admin.attendance');
+
 });
 
 

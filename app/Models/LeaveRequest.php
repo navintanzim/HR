@@ -23,5 +23,10 @@ class LeaveRequest extends Model
         'decided_by',
     ];
 
+    protected $casts = [
+    'start_date' => 'datetime',
+    'end_date'   => 'datetime',
+];
+
     public $timestamps = true;
 }
