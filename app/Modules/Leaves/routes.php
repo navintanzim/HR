@@ -7,7 +7,7 @@ Route::prefix('leaves')->group(function () {
 
     Route::middleware('auth')->group(function () {
 
-        Route::get('/', [LeavesController::class, 'index'])->name('employees.index');
+        Route::get('/', [LeavesController::class, 'index'])->name('leaves.index');
         Route::get('/apply', [LeavesController::class, 'create'])
             ->name('leaves.apply');
         Route::post('/apply', [LeavesController::class, 'store'])
