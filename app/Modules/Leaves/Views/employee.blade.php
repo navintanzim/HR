@@ -26,6 +26,21 @@ async function generateLeaveCount() {
 
         <s-section>
             @if(Auth::user()->role =='101')
+
+            <s-stack gap="400" align="end">
+                <s-date-field id="fromDate" label="From date"></s-date-field>
+                <s-date-field id="toDate" label="To date"></s-date-field>
+                <div style="padding: 10px;">
+                    <s-button variant="primary" onclick="generateLeaveCount()" >
+                    Generate
+                </s-button>
+                </div> <br>
+                <s-text id="leaveCountResult" type="strong"></s-text>
+            </s-stack>
+
+            
+
+
             <s-text type="strong" style="margin-bottom: 8px;" tone="success">All Leave Requests For this Employee</s-text>
             <s-table>
 
@@ -130,18 +145,6 @@ async function generateLeaveCount() {
             </s-table>
 
 
-            <s-stack gap="400" align="end">
-                <s-date-field id="fromDate" label="From date"></s-date-field>
-                <s-date-field id="toDate" label="To date"></s-date-field>
-                <div style="padding-top: 10px;">
-                    <s-button variant="primary" onclick="generateLeaveCount()" >
-                    Generate
-                </s-button>
-                </div>
-                
-            </s-stack>
-
-            <s-text id="leaveCountResult" type="strong"></s-text>
 
            
             @endif
