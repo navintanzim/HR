@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $employees = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
-                ->where('status', 'Pending')->get([
+                ->where('leave_requests.status', 'Pending')->get([
                 'leave_requests.id',
                 'employee.employee_id',
                 'employee.name as name',
@@ -27,7 +27,7 @@ class DashboardController extends Controller
                 'start_date',
                 'end_date',
                 'total_days',
-                'status'
+                'leave_requests.status'
             ]);
 
             $employees = User::where('role','505')->get();

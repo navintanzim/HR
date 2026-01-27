@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('klincode'),
             'role' => '101',
+            'status' => 'active',
         ]);
         Settings::create([
             'key' => 'Timezone',

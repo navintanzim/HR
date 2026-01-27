@@ -55,6 +55,7 @@ class UsersController extends Controller
                 'email_verified_at' => now(),
                 'password' => Hash::make($data['password']),
                 'role' => $role,
+                'status' => 'active',
                 'created_at' => now(),
             ]);
 
@@ -76,6 +77,21 @@ class UsersController extends Controller
         
 
         return redirect('/users')->with('success', 'User registered successfully!');
+    }
+
+    public function activate(User $user)
+    {
+        $user->update(['status' => 'active']);
+
+        return back()->with('success', 'User activated.');
+    }
+
+    public function deactivate(User $user)
+    {
+        
+        $user->update(['status' => 'inactive']);
+
+        return back()->with('error', 'User deactivated.');
     }
     
 }

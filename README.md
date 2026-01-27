@@ -36,5 +36,7 @@ npm run dev
 5) You should see a login and register option at http://localhost:8000/
 
 You have two types of users: Employee and Admin. They are defined by the 'Roles' radio button. An employee can check in for daily attendance and apply for leave. An admin can approve/reject the leaves but can not apply himself or check in. But he has access to additional modules like Settings and Users. Settings defines app configurations like office time, default leave days etc. Users module handles new user creation.
+
+The auto absent cron is scheduled at app/Console/Kernel.php. You can modify it there if needed. Or if you simply want to change the time limit for absent, do so at the Settings module as an admin. Generally, an employee will be made auto absent at 9:30.
   
 

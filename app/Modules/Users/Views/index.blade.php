@@ -34,6 +34,7 @@
                     <s-table-header>Email</s-table-header>
                     <s-table-header>Role</s-table-header>
                     <s-table-header>Type</s-table-header>
+                    <s-table-header>Action</s-table-header>
 
                 </s-table-header-row>
 
@@ -45,6 +46,37 @@
                         <s-table-cell>{{ $user->email }}</s-table-cell>
                         <s-table-cell>{{ $user->role }}</s-table-cell>
                         <s-table-cell>@if($user->role=='505')Employee @else Admin @endif</s-table-cell>
+                        <s-table-cell>
+
+                        @if ($user->status === 'active')
+                            <form method="POST" action="{{ route('users.deactivate', $user->id) }}">
+                                @csrf
+                                @method('PATCH')
+
+                                <button style="color:red;"
+                                    type="submit"
+                                    class="px-3 py-1 text-sm  hover:bg-red-700"
+                                    onclick="return confirm('Deactivate this user?')"
+                                >
+                                    Deactivate
+                                </button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('users.activate', $user->id) }}">
+                                @csrf
+                                @method('PATCH')
+
+                                <button style="color:green;"
+                                    type="submit"
+                                    class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                                    onclick="return confirm('Activate this user?')"
+                                >
+                                    Activate
+                                </button>
+                            </form>
+                        @endif
+
+                        </s-table-cell>
                     </s-table-row>
                     @empty
                     <s-table-row>

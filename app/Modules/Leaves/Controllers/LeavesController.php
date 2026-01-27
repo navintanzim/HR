@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Mail\LeaveDecisionMail;
 use App\Mail\LeaveRequestMail;
 use App\Models\User;
+use App\Modules\Leaves\Models\Logs;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -25,7 +26,7 @@ class LeavesController extends Controller
         $paidRemaining = null;
         if (Auth::user()->role == '101') {
             $leave_request =  LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
-                ->where('status', 'Pending')->get([
+                ->where('leave_requests.status', 'Pending')->get([
                     'leave_requests.id',
                     'employee.employee_id',
                     'employee.name as name',
@@ -33,7 +34,7 @@ class LeavesController extends Controller
                     'start_date',
                     'end_date',
                     'total_days',
-                    'status'
+                    'leave_requests.status'
                 ]);
 
             $leave = LeaveBalance::leftjoin('users as employee', 'employee.employee_id', 'leave_balances.employee_id')->get([
@@ -55,7 +56,7 @@ class LeavesController extends Controller
                     'start_date',
                     'end_date',
                     'total_days',
-                    'status'
+                    'leave_requests.status'
                 ]);
         } else {
 
@@ -142,7 +143,11 @@ class LeavesController extends Controller
                     ->send(new LeaveRequestMail($leave, $employee_mail));
             }
         } catch (\Exception $e) {
-            Log::error("Leave mail failed for leave {$leave->id}: " . $e->getMessage());
+            Logs::create([
+                'error' => $e->getMessage(),
+                'source' => 'LeavesController.store',
+            ]);
+            
         }
 
         return redirect()
@@ -191,8 +196,16 @@ class LeavesController extends Controller
             $leave_balance->save();
         }
 
-        Mail::to($user->email)
-            ->send(new LeaveDecisionMail($leave, $request->status));
+        try {
+
+            Mail::to($user->email)
+                ->send(new LeaveDecisionMail($leave, $request->status));
+        } catch (\Exception $e) {
+            Logs::create([
+                'error' => $e->getMessage(),
+                'source' => 'LeavesController.process',
+            ]);
+        }
 
         return redirect()->route('dashboard')->with('success', 'Leave request processed successfully.');
     }
@@ -211,7 +224,7 @@ class LeavesController extends Controller
                 'end_date',
                 'total_days',
                 'reason',
-                'status'
+                'leave_requests.status'
             ]);
         $pending_leaves = LeaveRequest::leftjoin('users as employee', 'employee.employee_id', 'leave_requests.employee_id')
             ->where('leave_requests.employee_id', $id)
@@ -225,7 +238,7 @@ class LeavesController extends Controller
                 'end_date',
                 'total_days',
                 'reason',
-                'status'
+                'leave_requests.status'
             ]);
         return view('leaves::employee', compact('team_leaves', 'id', 'pending_leaves'));
     }

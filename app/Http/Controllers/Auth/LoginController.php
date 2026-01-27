@@ -32,6 +32,11 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            if(Auth::user()->status=='inactive'){
+                Auth::logout();
+                $request->session()->invalidate(); 
+                return redirect()->route('login')->with('error', 'Your user has been deactivated. Please contact the system admin');
+            }
             if (Auth::user()->role == '505' && $now->greaterThan($absentTime)) {
                 $today_attendance = Attendance::where('date', now()->startOfDay())
                     ->where('employee_id', Auth::user()->employee_id)

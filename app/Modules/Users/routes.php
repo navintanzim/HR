@@ -8,7 +8,12 @@ Route::prefix('users')->group(function () {
     Route::put('/', [UsersController::class, 'update'])->name('users.update');
 });
 
-Route::middleware('auth')->group(function () { 
+Route::middleware('auth')->group(function () {
     Route::get('/register', [UsersController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [UsersController::class, 'register']);
+    Route::patch('/{user}/activate', [UsersController::class, 'activate'])
+        ->name('users.activate');
+
+    Route::patch('/{user}/deactivate', [UsersController::class, 'deactivate'])
+        ->name('users.deactivate');
 });
