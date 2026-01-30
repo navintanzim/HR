@@ -11,7 +11,7 @@
 
 ## Manual
 
-1) First download the repo: https://github.com/navintanzim/HRMVP/tree/polaris.
+1) First download the repo: https://github.com/navintanzim/HR/tree/polaris.
 
 2) Be careful to use the polaris branch, the main and master are not valid. Its set as default but still be sure. git clone --branch polaris https://github.com/navintanzim/HRMVP.git
 
