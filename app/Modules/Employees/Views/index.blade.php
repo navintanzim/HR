@@ -44,6 +44,7 @@ $absent_attendance_weekly = $attendance_weekly->where('status', 'Absent')->count
     };
 </script>
 <x-layout>
+  <div style="background-color: #eef6ff; min-height: 100vh; padding: 1rem;">
   <s-page>
     <s-section>
       <h1 class="text-xl font-bold mb-4">Employee Attendance Info</h1>
@@ -132,4 +133,5 @@ $absent_attendance_weekly = $attendance_weekly->where('status', 'Absent')->count
 
     </s-section>
   </s-page>
+  </div>
 </x-layout>

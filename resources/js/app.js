@@ -221,6 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyContainer = document.getElementById('weeklyChartContainer');
     const monthlyContainer = document.getElementById('monthlyChartContainer');
 
+    if (!lifetimeBtn || !weeklyBtn || !monthlyBtn || !lifetimeContainer || !weeklyContainer || !monthlyContainer) {
+        return;
+    }
+
     lifetimeBtn.addEventListener('click', () => {
         lifetimeContainer.style.display = lifetimeContainer.style.display === 'none' ? '' : 'none';
         weeklyContainer.style.display = 'none';
@@ -240,5 +244,4 @@ document.addEventListener('DOMContentLoaded', () => {
         lifetimeContainer.style.display = 'none';
     });
 });
-
 

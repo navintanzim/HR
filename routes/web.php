@@ -7,6 +7,10 @@ use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
     return view('welcome');
 });
 
@@ -39,4 +43,3 @@ Route::post('/logout', function (Illuminate\Http\Request $request) {
     $request->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
-

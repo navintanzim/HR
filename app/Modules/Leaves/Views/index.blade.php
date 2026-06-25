@@ -25,6 +25,7 @@ $paidTotal = $leave->paid_total;
 </script>
 @endif
 <x-layout>
+  <div style="background-color: #eef6ff; min-height: 100vh; padding: 1rem;">
   <s-page>
 
     <s-section >
@@ -160,4 +161,5 @@ $paidTotal = $leave->paid_total;
      @endif
 
   </s-page>
+  </div>
 </x-layout>

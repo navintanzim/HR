@@ -1,6 +1,7 @@
 <x-layout>
 
 
+  <div style="background-color: #eef6ff; min-height: 100vh; padding: 1rem;">
   <s-page>
     <s-section>
 
@@ -85,14 +86,9 @@
         @endif
 
       </s-section>
-
-
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit">Logout</button>
-      </form>
     </s-section>
   </s-page>
+  </div>
 
 
 </x-layout>

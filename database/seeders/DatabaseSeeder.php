@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'employee_id' => '1011',
             'name' => 'HR',
-            'email' => 'support@klinkode.com',
+            'email' => 'tanzim.klinkode@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('klincode'),
             'role' => '101',

@@ -1,5 +1,6 @@
 
 <x-layout>
+    <div style="background-color: #eef6ff; min-height: 100vh; padding: 1rem;">
     <s-page>
         <s-section>
             <h1 class="text-xl font-bold mb-4">Settings</h1>
@@ -80,4 +81,5 @@
 
         </s-section>
     </s-page>
+    </div>
 </x-layout>

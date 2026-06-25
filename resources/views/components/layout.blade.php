@@ -9,19 +9,14 @@
     <!-- @vite(['resources/css/app.css', 'resources/js/app.js']) dont use tailwind yet--> 
 </head>
 
-<body class="bg-gray-50 flex h-screen">
+<body style="margin: 0;">
 
-
-    <aside class="w-64 bg-white shadow-md border-r border-gray-200">
-        <div class="p-4 font-bold text-lg border-b border-gray-200">
+    <header style="background-color: #dcfce7; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+        <div style="font-size: 1.125rem; font-weight: 700; white-space: nowrap;">
             Welcome to HR dashboard
         </div>
 
-    </aside>
-
-
-    <main class="">
-        <nav class="p-4" style="display: flex;justify-content: center;margin: 10px;padding: 10px;">
+        <nav style="display: flex; justify-content: center; flex: 1;">
             <s-inline-stack spacing="loose">
                 <a href="/dashboard" class="block rounded" style="padding: 50px;">Dashboard</a>
                 <a href="/leaves" class="block rounded" style="padding: 50px;">Leaves</a>
@@ -34,6 +29,17 @@
             </s-inline-stack>
         </nav>
 
+        <div style="display: flex; justify-content: flex-end;">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" style="padding: 8px 14px; border: 1px solid #86efac; border-radius: 8px; background-color: #ffffff; cursor: pointer;">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <main>
         {{ $slot }}
     </main>
 
